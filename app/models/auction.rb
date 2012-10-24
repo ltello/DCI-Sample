@@ -34,8 +34,34 @@ class Auction < ActiveRecord::Base
     status == STARTED
   end
 
+  def expired?
+    end_date_in_past? and started?
+  end
+
   def last_bid
     bids.last
+  end
+
+  def has_winning_bid?
+    last_bid.present?
+  end
+
+  def close_if_expired
+    return unless expired?
+
+    if has_winning_bid?
+      close_with_winner
+    else
+      close_without_winner
+    end
+  end
+
+  def close_with_winner
+    assign_winner last_bid.user
+  end
+
+  def close_without_winner
+    close
   end
 
   def extend_end_date_for interval
@@ -64,11 +90,15 @@ class Auction < ActiveRecord::Base
 
   private
 
-  def end_date_period
-    errors.add(:end_date, "must be in the future") if end_date && end_date < DateTime.current
-  end
+    def end_date_in_past?
+      end_date < DateTime.current
+    end
 
-  def buyer_and_seller_are_different
-    errors.add(:base, "can't be equal to seller") if seller_id == winner_id
-  end
+    def end_date_period
+      errors.add(:end_date, "must be in the future") if end_date && end_date < DateTime.current
+    end
+
+    def buyer_and_seller_are_different
+      errors.add(:base, "can't be equal to seller") if seller_id == winner_id
+    end
 end

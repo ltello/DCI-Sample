@@ -14,7 +14,9 @@ class AuctionsController < ApplicationController
   end
 
   def create
-    CreatingAuction.create(current_user, auction_params, self)
+    CreatingAuction.new(:seller          => current_user,
+                        :auction_creator => auction_params,
+                        :listener        => self).run
   end
 
   def create_on_success auction_id

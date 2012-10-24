@@ -6,33 +6,36 @@ describe ClosingExpiredAuctions do
     let(:bid){stub(user: bidder)}
 
     it "closes an auction if its end date is in the past and it's started" do
-      auction = expired_auction last_bid: nil
+      auction = expired_auction
+      auction.bids = nil
       auction.should_receive(:close)
-      ClosingExpiredAuctions.close [auction]
+      ClosingExpiredAuctions.new(:expirable_auctions => [auction]).close
     end
 
     it "assigns a winner when auction has a bid" do
-      auction = expired_auction last_bid: bid
+      auction = expired_auction
+      auction.bids << bid
       auction.should_receive(:assign_winner).with(bidder)
-      ClosingExpiredAuctions.close [auction]
+      ClosingExpiredAuctions.new(:expirable_auctions => [auction]).close
     end
   end
 
   context "not expired auction" do
     it "doesn't close an auction if its end date is in the future" do
-      auction = stub(end_date: DateTime.current + 1.day, started?: true)
-      ClosingExpiredAuctions.close [auction]
+      auction = expired_auction(end_date: DateTime.current + 1.day, status: 'started')
+      ClosingExpiredAuctions.new(:expirable_auctions => [auction]).close
     end
 
     it "doesn't close an auction if it's not started" do
-      auction = stub(end_date: DateTime.current - 1.day, started?: false)
-      ClosingExpiredAuctions.close [auction]
+      auction = expired_auction(end_date: DateTime.current - 1.day, status: 'pending')
+      ClosingExpiredAuctions.new(:expirable_auctions => [auction]).close
     end
   end
 
   private
 
   def expired_auction attrs = {}
-    mock({end_date: DateTime.current - 1.day, started?: true}.merge(attrs))
+    params = {seller: ObjectMother.create_user, item: Item.create, buy_it_now_price: 10, extendable: true, end_date: (DateTime.current - 1.day), status: 'started'}
+    Auction.make params.merge(attrs)
   end
 end

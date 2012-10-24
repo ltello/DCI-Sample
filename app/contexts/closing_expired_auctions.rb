@@ -1,53 +1,16 @@
-class ClosingExpiredAuctions
-  include Context
+class ClosingExpiredAuctions < Context
 
-  def self.close auctions
-    ClosingExpiredAuctions.new(auctions).close
-  end
+  # Role definitions
 
-  attr_reader :expirable_auctions
-
-  def initialize auctions
-    @expirable_auctions = auctions.map{|auction| auction.extend Expirable}
-  end
-
-  def close
-    in_context do
-      expirable_auctions.each do |auction|
-        auction.close_if_expired
-      end
-    end
-  end
-
-  module Expirable
-    def close_if_expired
-      return unless expired?
-
-      if has_winning_bid?
-        close_with_winner
-      else
-        close_without_winner
+    role :expirable_auctions do
+      def close_those_expired
+        each(&:close_if_expired)
       end
     end
 
-    def close_with_winner
-      assign_winner last_bid.user
+  # Interactions
+    def close
+      expirable_auctions.close_those_expired
     end
 
-    def close_without_winner
-      close
-    end
-
-    def has_winning_bid?
-      last_bid.present?
-    end
-
-    def expired?
-      end_date_in_past? and started?
-    end
-
-    def end_date_in_past?
-      end_date < DateTime.current
-    end
-  end
 end

@@ -2,11 +2,20 @@ class BidsController < ApplicationController
   before_filter :authenticate_user!
 
   def create
-    Bidding.bid(current_user, bid_params, self)
+    Bidding.new(:bidder   => current_user,
+                :biddable => Auction.find(params[:auction_id]),
+                :request  => bid_params,
+                :listener => self).bid
   end
 
   def buy
-    Bidding.buy(current_user, bid_params, self)
+    auction = Auction.find(params[:auction_id])
+    request = bid_params
+    request.amount = auction.buy_it_now_price
+    Bidding.new(:bidder   => current_user,
+                :biddable => auction,
+                :request  => request,
+                :listener => self).bid
   end
 
   def create_on_success message
@@ -23,7 +32,7 @@ class BidsController < ApplicationController
 
   def bid_params
     p = {auction_id: params[:auction_id]}
-    p = p.merge(params[:bid_params]) if params[:bid_params]
+    p.merge!(params[:bid_params]) if params[:bid_params]
     BidParams.new(p)
   end
 end

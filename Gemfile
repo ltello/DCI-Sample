@@ -6,6 +6,7 @@ gem 'devise'
 gem 'sidekiq'
 gem 'slim'
 gem 'sinatra', :require => nil
+gem 'dci-ruby'
 
 group :development, :test do
   gem 'sqlite3'
@@ -13,6 +14,10 @@ group :development, :test do
   gem 'capybara'
   gem 'capybara-webkit'
   gem 'database_cleaner'
+end
+
+group :development do
+  gem 'debugger'
 end
 
 group :production do

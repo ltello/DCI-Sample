@@ -152,8 +152,11 @@ describe Bidding do
   def make_bid options = {}
     amount = options.fetch(:amount, 999)
     params = BidParams.new(amount: amount, auction: auction)
-    user = options.fetch(:bidder, bidder)
-    Bidding.new(user, auction, params, listener).bid
+    user   = options.fetch(:bidder, bidder)
+    Bidding.new(:bidder   => user,
+                :biddable => auction,
+                :request  => params,
+                :listener => listener).bid
   end
 
   def bid options = {}

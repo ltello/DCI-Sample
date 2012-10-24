@@ -3,7 +3,7 @@ class ClosingExpiredAuctionsWorker
 
   def perform
     Auction.find_in_batches do |auctions|
-      ClosingExpiredAuctions.close auctions
+      ClosingExpiredAuctions.new(:expirable_auctions => auctions).close
     end
   end
 end

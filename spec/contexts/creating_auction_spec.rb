@@ -69,6 +69,8 @@ describe CreatingAuction do
   private
 
   def create_auction
-    CreatingAuction.new(seller, params, listener).create
+    CreatingAuction.new(:seller          => seller,
+                        :auction_creator => params,
+                        :listener        => listener).run
   end
 end
