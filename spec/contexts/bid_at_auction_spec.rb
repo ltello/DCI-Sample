@@ -99,10 +99,10 @@ describe BidAtAuction do
 
   def make_auction(opts={})
     CreateAuction[seller:           opts.fetch(:seller,           seller),
-                    item_name:        opts.fetch(:item_name,        'item_name'),
-                    item_description: opts.fetch(:item_description, 'item1_description'),
-                    end_date:         opts.fetch(:end_date,         (Time.now + 90.minutes)),
-                    buy_it_now_price: opts.fetch(:buy_it_now_price, buy_it_now_price),
-                    extendable:       opts.fetch(:extendable,       true)]
+                  item_name:        opts.fetch(:item_name,        'item_name'),
+                  item_description: opts.fetch(:item_description, 'item1_description'),
+                  end_date:         opts.fetch(:end_date,         (Time.now + 90.minutes)),
+                  buy_it_now_price: opts.fetch(:buy_it_now_price, buy_it_now_price),
+                  extendable:       opts.fetch(:extendable,       true)]
   end
 end

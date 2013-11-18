@@ -2,10 +2,12 @@ require 'model_spec_helper'
 
 describe CreateAuction do
 
-  let(:buy_it_now_price) {10000}
-  let(:seller)           {User.create(password: 'seller1', password_confirmation: 'seller1', email: 'seller1@gmail.com', name: 'seller1')}
-  let(:item_params)      {{item_name:'item1_name', item_description:'item1_description'}}
-  let(:end_date)         {Time.now + 90.minutes}
+  let(:buy_it_now_price)     {10000}
+  let(:seller)               {User.create(password: 'seller1', password_confirmation: 'seller1', email: 'seller1@gmail.com', name: 'seller1')}
+  let(:item_params)          {{item_name:'item1_name', item_description:'item1_description'}}
+  let(:end_date)             {Time.now + 90.minutes}
+  let(:no_extendable_params) {item_params.merge(buy_it_now_price: buy_it_now_price, end_date: end_date, extendable: true)}
+  let(:all_auction_params)   {no_extendable_params.merge(extendable: true)}
 
   describe "Calling" do
 
@@ -30,7 +32,7 @@ describe CreateAuction do
       end
 
       it "... and :item_description and :extendable entry args are optional." do
-        r = create_auction(item_params.merge(buy_it_now_price: buy_it_now_price, end_date: end_date, extendable: true))
+        r = create_auction(no_extendable_params)
         r.should_not be_a(InvalidRecordException)
         r.should be_an(Auction)
       end
@@ -40,28 +42,27 @@ describe CreateAuction do
   describe "Successful creation" do
 
     it "The result of calling this context is the creation of new item instance..." do
-      ->{create_auction(item_params.merge(buy_it_now_price: buy_it_now_price, end_date: end_date, extendable: true))}.should change(Item, :count).by(1)
+      ->{create_auction(all_auction_params)}.should change(Item, :count).by(1)
     end
 
     it "... with the given item values as fields" do
-      create_auction(item_params.merge(buy_it_now_price: buy_it_now_price, end_date: end_date, extendable: true))
+      create_auction(all_auction_params)
       new_item = Item.last
       [new_item.name, new_item.description].should == item_params.values_at(:item_name, :item_description)
     end
 
     it "Of course, it also creates a new auction instance..." do
-      ->{create_auction(item_params.merge(buy_it_now_price: buy_it_now_price, end_date: end_date, extendable: true))}.should change(Auction, :count).by(1)
+      ->{create_auction(all_auction_params)}.should change(Auction, :count).by(1)
     end
 
     it "... with the given args as fields" do
-      auction_params = item_params.merge(buy_it_now_price: buy_it_now_price, end_date: end_date, extendable: true)
-      auction = create_auction(auction_params)
+      auction = create_auction(all_auction_params)
       [auction.item.name, auction.item.description].should == item_params.values_at(:item_name, :item_description)
-      [auction.seller, auction.item.name, auction.item.description, auction.buy_it_now_price, auction.end_date, auction.extendable].should == [seller, *auction_params.values]
+      [auction.seller, auction.item.name, auction.item.description, auction.buy_it_now_price, auction.end_date, auction.extendable].should == [seller, *all_auction_params.values]
     end
 
     it "Moreover, it also starts the recently created auction" do
-      create_auction(item_params.merge(buy_it_now_price: buy_it_now_price, end_date: end_date, extendable: true)).should be_started
+      create_auction(all_auction_params).should be_started
     end
   end
 
