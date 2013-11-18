@@ -1,3 +1,4 @@
+require 'spec_helper'
 require 'unit_spec_helper'
 require 'active_record'
 require 'virtus'

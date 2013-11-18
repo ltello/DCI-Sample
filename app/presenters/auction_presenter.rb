@@ -1,44 +1,41 @@
 class AuctionPresenter
-  extend Forwardable
 
-  def_delegator :@item, :name, :item_name
-  def_delegator :@item, :description, :item_description
-  def_delegator :@seller, :name, :seller_name
+  delegate :name, :description,                                       :to => :item,   :prefix => true
+  delegate :name,                                                     :to => :seller, :prefix => true
+  delegate :name,                                                     :to => :winner, :prefix => true, :allow_nil => true
+  delegate :buy_it_now_price, :id, :created_at, :extendable, :status, :to => :auction
 
-  def_delegators :@auction, :buy_it_now_price, :id, :created_at, :extendable
 
-  def initialize auction, current_user, view_context
-    @auction = auction
-
-    @item = auction.item
-    @seller = auction.seller
-    @winner = auction.winner
-
+  def initialize(auction, current_user, view_context)
+    @auction      = auction
+    @item         = auction.item
+    @seller       = auction.seller
+    @winner       = auction.winner
     @view_context = view_context
     @current_user = current_user
   end
 
   def render_end_date
-    return "" unless @auction.end_date
+    return "" unless auction.end_date
     h.content_tag :dl, class: "dl-horizontal" do
       h.content_tag(:dt, "End Date") +
-      h.content_tag(:dd, @auction.end_date, id: "end-date")
+      h.content_tag(:dd, auction.end_date, id: "end-date")
     end
   end
 
   def render_winner
-    return "" unless @winner
+    return "" unless winner
     h.content_tag :dl, class: "dl-horizontal" do
       h.content_tag(:dt, "Winner") +
-      h.content_tag(:dd, @winner.name, id: "winner")
+      h.content_tag(:dd, winner_name, id: "winner")
     end
   end
 
   def render_last_bid
-    return "" unless @auction.last_bid
+    return "" unless auction.last_bid
     h.content_tag :dl, class: "dl-horizontal" do
       h.content_tag(:dt, "Last Bid") +
-        h.content_tag(:dd, @auction.last_bid.amount.to_s, id: "last-bid")
+        h.content_tag(:dd, auction.last_bid.amount.to_s, id: "last-bid")
     end
   end
 
@@ -58,8 +55,10 @@ class AuctionPresenter
 
   private
 
+  attr_reader :auction, :item, :seller, :winner, :view_context, :current_user
+
   def all_bids
-    @auction.bids.map do |bid|
+    auction.bids.map do |bid|
       h.content_tag :li do
         "#{bid.user.name} bids $#{bid.amount}"
       end.html_safe
@@ -67,11 +66,11 @@ class AuctionPresenter
   end
 
   def seller?
-    @auction.seller == @current_user
+    auction.seller == current_user
   end
 
   def can_bid?
-    @auction.started? && @auction.seller != @current_user
+    auction.started? && auction.seller != current_user
   end
 
   def render_buy_it_now_button
@@ -83,6 +82,6 @@ class AuctionPresenter
   end
 
   def h
-    @view_context
+    view_context
   end
 end

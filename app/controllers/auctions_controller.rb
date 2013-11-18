@@ -14,23 +14,23 @@ class AuctionsController < ApplicationController
   end
 
   def create
-    CreatingAuction.new(:seller          => current_user,
-                        :auction_creator => auction_params,
-                        :listener        => self).run
+    result = CreateAuction[auction_params.merge(:seller => current_user)]
+    result.errors.blank? ? auction_created_response!(result) : no_auction_created_response!(result.errors)
   end
 
-  def create_on_success auction_id
-    flash[:notice] = "Auction was successfully created."
-    render json: {auction_path: auction_path(auction_id)}
-  end
-
-  def create_on_error errors
-    render json: {:errors => errors}, status: :unprocessable_entity
-  end
 
   private
 
   def auction_params
-    AuctionParams.new(params[:auction_params])
+    @auction_params ||= AuctionParams.new(params[:auction_params]).attributes
+  end
+
+  def auction_created_response!(auction)
+    flash[:notice] = "Auction was successfully created."
+    render json: {auction_path: auction_path(auction.id)}
+  end
+
+  def no_auction_created_response!(errors)
+    render json: {:errors => errors}, status: :unprocessable_entity
   end
 end

@@ -6,13 +6,15 @@
         <ul class="nav">
           <li><%= link_to "Auctions", auctions_path %></li>
           <li><%= link_to "Sell", new_auction_path %></li>
-          <% if user_signed_in? %>
-            <li><%= link_to 'Sign out', destroy_user_session_path, :method => :delete %></li>
-          <% else %>
-            <li><%= link_to 'Sign in', new_user_session_path %></li>
-          <% end %>
         </ul>
       </div>
+      <ul class="nav" style="float:right;">
+        <% if user_signed_in? %>
+          <li><%= link_to "Sign out #{current_user.name}" , destroy_user_session_path, :method => :delete %></li>
+        <% else %>
+          <li><%= link_to 'Sign in', new_user_session_path %></li>
+        <% end %>
+      </ul>
     </div>
   </div>
 </div>
