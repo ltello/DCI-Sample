@@ -1,9 +1,10 @@
 class AuctionPresenter
 
-  delegate :name, :description,                                       :to => :item,   :prefix => true
-  delegate :name,                                                     :to => :seller, :prefix => true
-  delegate :name,                                                     :to => :winner, :prefix => true, :allow_nil => true
-  delegate :buy_it_now_price, :id, :created_at, :extendable, :status, :to => :auction
+  delegate :name, :description,                 :to => :item,   :prefix => true
+  delegate :name,                               :to => :seller, :prefix => true
+  delegate :name,                               :to => :winner, :prefix => true, :allow_nil => true
+  delegate :buy_it_now_price, :id, :created_at, :to => :auction
+  delegate :extendable, :status, :last_price,   :to => :auction
 
 
   def initialize(auction, current_user, view_context)
@@ -52,6 +53,11 @@ class AuctionPresenter
       res << render_buy_it_now_button if can_bid?
     end.html_safe
   end
+
+  def number_of_bids
+    auction.bids.count
+  end
+
 
   private
 

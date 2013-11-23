@@ -9,6 +9,9 @@
     <th>Seller</th>
     <th>Created at</th>
     <th>Status</th>
+    <th>#Bids</th>
+    <th>Last Bid</th>
+    <th>Buy Price</th>
     <th>Winner</th>
   </tr>
   </thead>
@@ -17,10 +20,13 @@
     <tr>
       <td><%= auction.id %></td>
       <td><%= link_to auction.item_name, auction_path(auction.id) %></td>
-      <td><%= auction.seller_name %></td>
-      <td><%= auction.created_at  %></td>
-      <td><%= auction.status      %></td>
-      <td><%= auction.winner_name %></td>
+      <td><%= auction.seller_name      %></td>
+      <td><%= auction.created_at       %></td>
+      <td><%= auction.status           %></td>
+      <td><%= auction.number_of_bids   %></td>
+      <td><%= auction.last_price       %></td>
+      <td><%= auction.buy_it_now_price %></td>
+      <td><%= auction.winner_name      %></td>
     </tr>
   <% end %>
   </tbody>
