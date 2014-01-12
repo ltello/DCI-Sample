@@ -16,5 +16,5 @@ capybara-*.html
 rerun.txt
 pickle-email-*.html
 .rvmrc
-.rvm-version
-.rvm-gemset
+.ruby-version
+.ruby-gemset
